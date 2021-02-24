@@ -1,6 +1,7 @@
 from Cryptodome.Cipher import AES
 from Crypto.PublicKey import RSA
 from Crypto.Cipher import PKCS1_OAEP
+from Crypto.Random import get_random_bytes
 import os.path
 from os import path
 
@@ -68,3 +69,16 @@ def decrypt_rsa(path_key, ciphertext):
     key = RSA.importKey(open(path_key).read())
     cipher = PKCS1_OAEP.new(key)
     return cipher.decrypt(ciphertext)
+
+
+def hybrid_encryption_individual(message, digital_envelope):
+    symmetric_session_key = get_random_bytes(32)
+    iv = get_random_bytes(16)
+
+    cipher_asymmetric = PKCS1_OAEP.new(RSA.import_key(digital_envelope))
+    encrypted_symmetric_key = cipher_asymmetric.encrypt(symmetric_session_key)
+
+    cipher_symmetric = AES.new(symmetric_session_key, AES.MODE_CFB, iv)
+    encrypted_message = cipher_symmetric.encrypt(bytes(message, encoding='utf-8'))
+
+    return encrypted_symmetric_key, encrypted_message, symmetric_session_key, iv

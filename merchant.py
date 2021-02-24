@@ -18,9 +18,9 @@ core.close_connection(ADDRESS_CM)
 
 symmetric_session_key = utils.decrypt_rsa('keys/merchant_private_key.pem', encrypted_symmetric_key)
 client_public_key = utils.decrypt_aes(symmetric_session_key, ciphertext, iv)
-print(client_public_key)
-print("-------------")
 
+print("-------------")
+print(client_public_key)
 # print(utils.decrypt_aes(symmetric_session_key, ciphertext))
 
 # core.add_sender(new_sender(ADDRESS_MC), ADDRESS_MC)
