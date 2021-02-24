@@ -58,8 +58,8 @@ def load_public_keys(is_client):
     return public_key
 
 
-def decrypt_aes(key, msg):
-    cipher = AES.new(key, AES.MODE_CFB)
+def decrypt_aes(key, msg, iv):
+    cipher = AES.new(key, AES.MODE_CFB, iv)
     plaintext = cipher.decrypt(msg)
     return plaintext.decode('utf-8')
 

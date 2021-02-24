@@ -11,12 +11,13 @@ core = Node()
 
 core.add_listener(new_listener(ADDRESS_CM), ADDRESS_CM)
 core.accept_connection(ADDRESS_CM)
+iv = core.receive_message(ADDRESS_CM)
 encrypted_symmetric_key = core.receive_message(ADDRESS_CM)
 ciphertext = core.receive_message(ADDRESS_CM)
 core.close_connection(ADDRESS_CM)
 
 symmetric_session_key = utils.decrypt_rsa('keys/merchant_private_key.pem', encrypted_symmetric_key)
-client_public_key = utils.decrypt_aes(symmetric_session_key, ciphertext)
+client_public_key = utils.decrypt_aes(symmetric_session_key, ciphertext, iv)
 print(client_public_key)
 print("-------------")
 

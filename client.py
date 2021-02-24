@@ -22,6 +22,7 @@ client_public_key = utils.load_public_keys(True)
 # s, which is in turn encrypted using an asymmetric key k (the digital envelope).
 
 symmetric_session_key = get_random_bytes(32)
+iv = get_random_bytes(16)
 
 cipher_asymmetric = PKCS1_OAEP.new(RSA.import_key(merchant_public_key))
 encrypted_symmetric_key = cipher_asymmetric.encrypt(symmetric_session_key)
@@ -33,11 +34,12 @@ client_public_key = client_public_key[ind_1+1:ind_2]
 print(client_public_key)
 print("-------------")
 
-cipher = AES.new(symmetric_session_key, AES.MODE_CFB)
+cipher = AES.new(symmetric_session_key, AES.MODE_CFB, iv)
 ciphertext = cipher.encrypt(bytes(client_public_key, encoding='utf-8'))
 
 core = Node()
 core.add_sender(new_sender(ADDRESS_CM), ADDRESS_CM)
+core.send_message_to_address(ADDRESS_CM, iv)
 core.send_message_to_address(ADDRESS_CM, encrypted_symmetric_key)
 core.send_message_to_address(ADDRESS_CM, ciphertext)
 core.close_connection(ADDRESS_CM)
