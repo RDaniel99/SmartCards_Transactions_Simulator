@@ -17,9 +17,9 @@ utils.generate_keys(True)
 merchant_public_key = utils.load_public_keys(False)
 client_public_key = utils.load_public_keys(True)
 
-ind_1 = client_public_key.find('\n')
-ind_2 = client_public_key.rfind('\n')
-client_public_key = client_public_key[ind_1 + 1:ind_2]
+# ind_1 = client_public_key.find('\n')
+# ind_2 = client_public_key.rfind('\n')
+# client_public_key = client_public_key[ind_1 + 1:ind_2]
 # Hybrid encryption of a message m with the key k means that the message m is encrypted using a symmetric session key
 # s, which is in turn encrypted using an asymmetric key k (the digital envelope).
 encrypted_symmetric_key, encrypted_message, symmetric_session_key, iv = utils.hybrid_encryption_individual(
@@ -34,6 +34,27 @@ core.send_message_to_address(ADDRESS_CM, iv)
 core.send_message_to_address(ADDRESS_CM, encrypted_symmetric_key)
 core.send_message_to_address(ADDRESS_CM, encrypted_message)
 core.close_connection(ADDRESS_CM)
+
+core.add_listener(new_listener(ADDRESS_MC), ADDRESS_MC)
+core.accept_connection(ADDRESS_MC)
+encrypted_messages = core.receive_message(ADDRESS_MC)
+core.close_connection(ADDRESS_MC)
+
+encrypted_symmetric_key, message, iv = encrypted_messages[0]
+K = utils.decrypt_rsa('keys/client_private_key.pem', encrypted_symmetric_key)
+print("------------- key")
+print(K)
+print("-------------")
+# m = utils.decrypt_aes(K, message, iv)
+
+print("------------- message")
+print(message)
+print("-------------")
+
+print("------------- iv")
+print(iv)
+print("-------------")
+
 #
 # core.add_listener(new_listener(ADDRESS_MC), ADDRESS_MC)
 # core.accept_connection(ADDRESS_MC)
