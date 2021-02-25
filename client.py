@@ -16,6 +16,7 @@ utils.generate_keys(True)
 
 merchant_public_key = utils.load_public_keys(False)
 client_public_key = utils.load_public_keys(True)
+client_private_key = utils.load_private_keys(True)
 
 # ind_1 = client_public_key.find('\n')
 # ind_2 = client_public_key.rfind('\n')
@@ -40,20 +41,12 @@ core.accept_connection(ADDRESS_MC)
 encrypted_messages = core.receive_message(ADDRESS_MC)
 core.close_connection(ADDRESS_MC)
 
-encrypted_symmetric_key, message, iv = encrypted_messages[0]
-K = utils.decrypt_rsa('keys/client_private_key.pem', encrypted_symmetric_key)
-print("------------- key")
-print(K)
-print("-------------")
-# m = utils.decrypt_aes(K, message, iv)
-
-print("------------- message")
-print(message)
-print("-------------")
-
-print("------------- iv")
-print(iv)
-print("-------------")
+for encrypted_message in encrypted_messages:
+    encrypted_symmetric_key, message, iv = encrypted_message
+    K = utils.decrypt_rsa(client_private_key, encrypted_symmetric_key)
+    m = utils.decrypt_aes(K, message, iv)
+    print("-------------")
+    print(m)
 
 #
 # core.add_listener(new_listener(ADDRESS_MC), ADDRESS_MC)

@@ -4,6 +4,7 @@ from Crypto.Cipher import PKCS1_OAEP
 from Crypto.Random import get_random_bytes
 from Crypto.Signature import pkcs1_15
 from Crypto.Hash import SHA256
+import base64
 
 import binascii
 import os.path
@@ -69,8 +70,8 @@ def decrypt_aes(key, msg, iv):
     return plaintext.decode('utf-8')
 
 
-def decrypt_rsa(path_key, ciphertext):
-    key = RSA.importKey(open(path_key).read())
+def decrypt_rsa(key, ciphertext):
+    key = RSA.importKey(key)
     cipher = PKCS1_OAEP.new(key)
     return cipher.decrypt(ciphertext)
 
@@ -105,7 +106,7 @@ def get_signature():
     sid_hash = SHA256.new(sid)
     key = RSA.import_key(private_key)
 
-    signed_hash = pkcs1_15.new(key). \
+    signature = pkcs1_15.new(key). \
         sign(sid_hash)
 
-    return sid, signed_hash
+    return base64.b64encode(sid).decode(), base64.b64encode(signature).decode()
