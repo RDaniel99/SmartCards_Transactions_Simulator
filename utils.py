@@ -96,6 +96,7 @@ def hybrid_encryption_individual(message, digital_envelope):
     cipher_symmetric = AES.new(symmetric_session_key, AES.MODE_CFB, iv)
 
     encrypted_message = cipher_symmetric.encrypt(message)
+    print()
     return encrypted_symmetric_key, encrypted_message, symmetric_session_key, iv
 
 

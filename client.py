@@ -62,6 +62,7 @@ for encrypted_message in encrypted_messages:
     sid_and_signature.append(m)
 
 #-------------------
+
 digits = string.digits
 card_number = get_random_string(10)
 card_exp = get_random_string(2) + "/" + get_random_string(2)
@@ -89,6 +90,22 @@ print("pi: ", pickle.loads(PI_bytes))
 signature = pkcs1_15.new(RSA.import_key(client_private_key)).sign(SHA256.new(PI_bytes))
 PM = (PI, signature)
 print("signature: ", base64.b64encode(signature).decode())
+
+f = open("keys/payment_gateway_public_key.pem", 'r')
+payment_gateway_public_key = f.read()
+f.close()
+
+f = open("keys/payment_gateway_private_key.pem", 'r')
+payment_gateway_private_key = f.read()
+f.close()
+
+PI_PM = []
+
+PI_PM.append(PI_bytes)
+PI_PM.append(signature)
+
+# encrypted_messages = utils.hybrid_encryption(PI_PM, payment_gateway_public_key)
+
 #
 # core.add_listener(new_listener(ADDRESS_MC), ADDRESS_MC)
 # core.accept_connection(ADDRESS_MC)
