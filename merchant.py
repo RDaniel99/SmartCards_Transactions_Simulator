@@ -5,8 +5,9 @@ from constants import ADDRESS_MC
 from constants import ADDRESS_CM
 from Crypto.Random import get_random_bytes
 import utils as utils
+import crypto_utils as crypto_utils
 
-merchant_private_key = utils.load_private_keys(False)
+merchant_private_key = utils.load_private_keys("merchant")
 
 core = Node()
 
@@ -17,13 +18,13 @@ encrypted_symmetric_key = core.receive_message(ADDRESS_CM)
 ciphertext = core.receive_message(ADDRESS_CM)
 core.close_connection(ADDRESS_CM)
 
-symmetric_session_key = utils.decrypt_rsa(merchant_private_key, encrypted_symmetric_key)
-client_public_key = utils.decrypt_aes(symmetric_session_key, ciphertext, iv)
+symmetric_session_key = crypto_utils.decrypt_rsa(merchant_private_key, encrypted_symmetric_key)
+client_public_key = crypto_utils.decrypt_aes(symmetric_session_key, ciphertext, iv)
 
 print("-------------")
 print(client_public_key)
 
-sid, signed_hash = utils.get_signature(get_random_bytes(8), merchant_private_key)
+sid, signed_hash = crypto_utils.get_signature(get_random_bytes(8), merchant_private_key)
 
 print(sid)
 print(signed_hash)
@@ -32,7 +33,7 @@ messages = []
 messages.append(bytes(sid, encoding='utf-8'))
 messages.append(bytes(signed_hash, encoding='utf-8'))
 
-encrypted_messages = utils.hybrid_encryption(messages, client_public_key)
+encrypted_messages = crypto_utils.hybrid_encryption(messages, client_public_key)
 
 for encrypted_message in encrypted_messages:
     del(encrypted_message[2])

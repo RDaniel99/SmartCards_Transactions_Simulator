@@ -16,6 +16,7 @@ import random
 from os import path
 import os.path
 import utils as utils
+import crypto_utils as crypto_utils
 
 
 def get_random_string(length):
@@ -25,15 +26,15 @@ def get_random_string(length):
     return result_str
 
 
-utils.generate_keys(True)
+utils.generate_keys("client")
 
-merchant_public_key = utils.load_public_keys(False)
-client_public_key = utils.load_public_keys(True)
-client_private_key = utils.load_private_keys(True)
+merchant_public_key = utils.load_public_keys("merchant")
+client_public_key = utils.load_public_keys("client")
+client_private_key = utils.load_private_keys("client")
 
 # Hybrid encryption of a message m with the key k means that the message m is encrypted using a symmetric session key
 # s, which is in turn encrypted using an asymmetric key k (the digital envelope).
-encrypted_symmetric_key, encrypted_message, symmetric_session_key, iv = utils.hybrid_encryption_individual(
+encrypted_symmetric_key, encrypted_message, symmetric_session_key, iv = crypto_utils.hybrid_encryption_individual(
     bytes(client_public_key, encoding='utf-8'), bytes(merchant_public_key, encoding='utf-8'))
 
 print("-------------")
@@ -55,8 +56,8 @@ sid_and_signature = []
 
 for encrypted_message in encrypted_messages:
     encrypted_symmetric_key, message, iv = encrypted_message
-    K = utils.decrypt_rsa(client_private_key, encrypted_symmetric_key)
-    m = utils.decrypt_aes(K, message, iv)
+    K = crypto_utils.decrypt_rsa(client_private_key, encrypted_symmetric_key)
+    m = crypto_utils.decrypt_aes(K, message, iv)
     print("-------------")
     print(m)
     sid_and_signature.append(m)
