@@ -99,14 +99,12 @@ def hybrid_encryption_individual(message, digital_envelope):
     return encrypted_symmetric_key, encrypted_message, symmetric_session_key, iv
 
 
-def get_signature():
-    private_key = load_private_keys(False)
-    sid = get_random_bytes(8)
+def get_signature(arg, private_key):
 
-    sid_hash = SHA256.new(sid)
+    sid_hash = SHA256.new(arg)
     key = RSA.import_key(private_key)
 
     signature = pkcs1_15.new(key). \
         sign(sid_hash)
 
-    return base64.b64encode(sid).decode(), base64.b64encode(signature).decode()
+    return base64.b64encode(arg).decode(), base64.b64encode(signature).decode()
