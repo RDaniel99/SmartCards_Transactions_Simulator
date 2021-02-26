@@ -9,6 +9,7 @@ def get_random_string(length):
 
     return result_str
 
+
 def generate_transaction_info(sid_and_signature, client_public_key):
     digits = string.digits
     card_number = utils.get_random_string(10)

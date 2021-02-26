@@ -17,17 +17,20 @@ import keys_utils as keys_utils
 
 keys_utils.generate_keys("client")
 
+payment_gateway_public_key = keys_utils.load_public_keys("payment_gateway")
 merchant_public_key = keys_utils.load_public_keys("merchant")
+
 client_public_key = keys_utils.load_public_keys("client")
 client_private_key = keys_utils.load_private_keys("client")
+
+# STEP 1 - Send {PubKC}PubKM
+# BEGIN
 
 # Hybrid encryption of a message m with the key k means that the message m is encrypted using a symmetric session key
 # s, which is in turn encrypted using an asymmetric key k (the digital envelope).
 encrypted_symmetric_key, encrypted_message, symmetric_session_key, iv = crypto_utils.hybrid_encryption_individual(
     bytes(client_public_key, encoding='utf-8'), bytes(merchant_public_key, encoding='utf-8'))
 
-# STEP 1 - Send {PubKC}PubKM
-# BEGIN
 core = Node()
 core.add_sender(new_sender(ADDRESS_CM), ADDRESS_CM)
 core.send_message_to_address(ADDRESS_CM, iv)
@@ -48,30 +51,19 @@ for encrypted_message in encrypted_messages:
     encrypted_symmetric_key, message, iv = encrypted_message
     K = crypto_utils.decrypt_rsa(client_private_key, encrypted_symmetric_key)
     m = crypto_utils.decrypt_aes(K, message, iv)
-    print("-------------")
-    print(m)
+
     sid_and_signature.append(m)
 # END
 
+# STEP 3 - Send {PM, PO}PubKM
+# BEGIN
 messages = utils.generate_transaction_info(sid_and_signature, client_public_key)
 
-print(messages)
 PI = list(messages.values())
-
 PI_bytes = pickle.dumps(PI)
-print("pi: ", pickle.loads(PI_bytes))
 
 signature = pkcs1_15.new(RSA.import_key(client_private_key)).sign(SHA256.new(PI_bytes))
 PM = (PI, signature)
-print("signature: ", base64.b64encode(signature).decode())
-
-f = open("keys/payment_gateway_public_key.pem", 'r')
-payment_gateway_public_key = f.read()
-f.close()
-
-f = open("keys/payment_gateway_private_key.pem", 'r')
-payment_gateway_private_key = f.read()
-f.close()
 
 PI_PM = [PI_bytes, signature]
 

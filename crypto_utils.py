@@ -32,6 +32,7 @@ def hybrid_encryption(messages, digital_envelope):
 
 
 def hybrid_encryption_individual(message, digital_envelope):
+    """Ambele trebuie in bytes, criptez message hybrid cu envelope"""
     symmetric_session_key = get_random_bytes(32)
     iv = get_random_bytes(16)
 
