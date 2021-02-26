@@ -6,8 +6,9 @@ from constants import ADDRESS_CM
 from Crypto.Random import get_random_bytes
 import utils as utils
 import crypto_utils as crypto_utils
+import keys_utils as keys_utils
 
-merchant_private_key = utils.load_private_keys("merchant")
+merchant_private_key = keys_utils.load_private_keys("merchant")
 
 core = Node()
 
@@ -41,8 +42,3 @@ for encrypted_message in encrypted_messages:
 core.add_sender(new_sender(ADDRESS_MC), ADDRESS_MC)
 core.send_message_to_address(ADDRESS_MC, encrypted_messages)
 core.close_connection(ADDRESS_MC)
-# print(utils.decrypt_aes(symmetric_session_key, ciphertext))
-
-#
-#
-# core.close_connection(ADDRESS_MC)

@@ -17,20 +17,14 @@ from os import path
 import os.path
 import utils as utils
 import crypto_utils as crypto_utils
+import keys_utils as keys_utils
 
 
-def get_random_string(length):
-    letters = string.digits
-    result_str = ''.join(random.choice(letters) for i in range(length))
+keys_utils.generate_keys("client")
 
-    return result_str
-
-
-utils.generate_keys("client")
-
-merchant_public_key = utils.load_public_keys("merchant")
-client_public_key = utils.load_public_keys("client")
-client_private_key = utils.load_private_keys("client")
+merchant_public_key = keys_utils.load_public_keys("merchant")
+client_public_key = keys_utils.load_public_keys("client")
+client_private_key = keys_utils.load_private_keys("client")
 
 # Hybrid encryption of a message m with the key k means that the message m is encrypted using a symmetric session key
 # s, which is in turn encrypted using an asymmetric key k (the digital envelope).
@@ -65,11 +59,11 @@ for encrypted_message in encrypted_messages:
 #-------------------
 
 digits = string.digits
-card_number = get_random_string(10)
-card_exp = get_random_string(2) + "/" + get_random_string(2)
-ccode = get_random_string(3)
-amount = get_random_string(4) + " euro"
-nc = get_random_string(5)
+card_number = utils.get_random_string(10)
+card_exp = utils.get_random_string(2) + "/" + utils.get_random_string(2)
+ccode = utils.get_random_string(3)
+amount = utils.get_random_string(4) + " euro"
+nc = utils.get_random_string(5)
 merchant_name = "Moda Operandi"
 
 messages = dict()
@@ -100,15 +94,6 @@ f = open("keys/payment_gateway_private_key.pem", 'r')
 payment_gateway_private_key = f.read()
 f.close()
 
-PI_PM = []
-
-PI_PM.append(PI_bytes)
-PI_PM.append(signature)
+PI_PM = [PI_bytes, signature]
 
 # encrypted_messages = utils.hybrid_encryption(PI_PM, payment_gateway_public_key)
-
-#
-# core.add_listener(new_listener(ADDRESS_MC), ADDRESS_MC)
-# core.accept_connection(ADDRESS_MC)
-# print(core.receive_message(ADDRESS_MC))
-# core.close_connection(ADDRESS_MC)
