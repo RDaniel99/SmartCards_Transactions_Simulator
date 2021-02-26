@@ -29,8 +29,8 @@ print(sid)
 print(signed_hash)
 
 messages = []
-messages.append(sid)
-messages.append(signed_hash)
+messages.append(bytes(sid, encoding='utf-8'))
+messages.append(bytes(signed_hash, encoding='utf-8'))
 
 encrypted_messages = utils.hybrid_encryption(messages, client_public_key)
 

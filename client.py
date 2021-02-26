@@ -34,7 +34,7 @@ client_private_key = utils.load_private_keys(True)
 # Hybrid encryption of a message m with the key k means that the message m is encrypted using a symmetric session key
 # s, which is in turn encrypted using an asymmetric key k (the digital envelope).
 encrypted_symmetric_key, encrypted_message, symmetric_session_key, iv = utils.hybrid_encryption_individual(
-    client_public_key, merchant_public_key)
+    bytes(client_public_key, encoding='utf-8'), bytes(merchant_public_key, encoding='utf-8'))
 
 print("-------------")
 print(client_public_key)
