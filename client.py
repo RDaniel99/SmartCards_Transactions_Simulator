@@ -6,15 +6,10 @@ import pickle
 from node import Node
 from node import new_listener
 from node import new_sender
-from Crypto.Cipher import AES
 from Crypto.PublicKey import RSA
-from Crypto.Cipher import PKCS1_OAEP
 from Crypto.Signature import pkcs1_15
 from Crypto.Hash import SHA256
 import string
-import random
-from os import path
-import os.path
 import utils as utils
 import crypto_utils as crypto_utils
 import keys_utils as keys_utils
@@ -31,23 +26,24 @@ client_private_key = keys_utils.load_private_keys("client")
 encrypted_symmetric_key, encrypted_message, symmetric_session_key, iv = crypto_utils.hybrid_encryption_individual(
     bytes(client_public_key, encoding='utf-8'), bytes(merchant_public_key, encoding='utf-8'))
 
-print("-------------")
-print(client_public_key)
-
+# STEP 1 - Send {PubKC}PubKM
+# BEGIN
 core = Node()
 core.add_sender(new_sender(ADDRESS_CM), ADDRESS_CM)
 core.send_message_to_address(ADDRESS_CM, iv)
 core.send_message_to_address(ADDRESS_CM, encrypted_symmetric_key)
 core.send_message_to_address(ADDRESS_CM, encrypted_message)
 core.close_connection(ADDRESS_CM)
+# END
 
+# STEP 2 - Receive {Sid, SigM(Sid)}PubKC
+# BEGIN
 core.add_listener(new_listener(ADDRESS_MC), ADDRESS_MC)
 core.accept_connection(ADDRESS_MC)
 encrypted_messages = core.receive_message(ADDRESS_MC)
 core.close_connection(ADDRESS_MC)
 
 sid_and_signature = []
-
 for encrypted_message in encrypted_messages:
     encrypted_symmetric_key, message, iv = encrypted_message
     K = crypto_utils.decrypt_rsa(client_private_key, encrypted_symmetric_key)
@@ -55,26 +51,9 @@ for encrypted_message in encrypted_messages:
     print("-------------")
     print(m)
     sid_and_signature.append(m)
+# END
 
-#-------------------
-
-digits = string.digits
-card_number = utils.get_random_string(10)
-card_exp = utils.get_random_string(2) + "/" + utils.get_random_string(2)
-ccode = utils.get_random_string(3)
-amount = utils.get_random_string(4) + " euro"
-nc = utils.get_random_string(5)
-merchant_name = "Moda Operandi"
-
-messages = dict()
-messages["card_number"] = card_number
-messages["card_exp"] = card_exp
-messages["ccode"] = ccode
-messages["sid"] = sid_and_signature[0]
-messages["amount"] = amount
-messages["pubKC"] = client_public_key
-messages["nc"] = nc
-messages["m"] = merchant_name
+messages = utils.generate_transaction_info(sid_and_signature, client_public_key)
 
 print(messages)
 PI = list(messages.values())

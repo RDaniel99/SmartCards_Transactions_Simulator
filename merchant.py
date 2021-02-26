@@ -4,7 +4,6 @@ from node import new_listener
 from constants import ADDRESS_MC
 from constants import ADDRESS_CM
 from Crypto.Random import get_random_bytes
-import utils as utils
 import crypto_utils as crypto_utils
 import keys_utils as keys_utils
 
@@ -30,9 +29,7 @@ sid, signed_hash = crypto_utils.get_signature(get_random_bytes(8), merchant_priv
 print(sid)
 print(signed_hash)
 
-messages = []
-messages.append(bytes(sid, encoding='utf-8'))
-messages.append(bytes(signed_hash, encoding='utf-8'))
+messages = [bytes(sid, encoding='utf-8'), bytes(signed_hash, encoding='utf-8')]
 
 encrypted_messages = crypto_utils.hybrid_encryption(messages, client_public_key)
 

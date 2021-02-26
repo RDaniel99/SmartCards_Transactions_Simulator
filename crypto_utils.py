@@ -8,12 +8,14 @@ import base64
 
 
 def decrypt_aes(key, msg, iv):
+    """Method to decrypt using AES (same IV as encryption)"""
     cipher = AES.new(key, AES.MODE_CFB, iv)
     plaintext = cipher.decrypt(msg)
     return plaintext.decode('utf-8')
 
 
 def decrypt_rsa(key, ciphertext):
+    """Method use to encrypt using RSA"""
     key = RSA.importKey(key)
     cipher = PKCS1_OAEP.new(key)
     return cipher.decrypt(ciphertext)
@@ -39,7 +41,7 @@ def hybrid_encryption_individual(message, digital_envelope):
     cipher_symmetric = AES.new(symmetric_session_key, AES.MODE_CFB, iv)
 
     encrypted_message = cipher_symmetric.encrypt(message)
-    print()
+
     return encrypted_symmetric_key, encrypted_message, symmetric_session_key, iv
 
 
@@ -47,7 +49,6 @@ def get_signature(arg, private_key):
     sid_hash = SHA256.new(arg)
     key = RSA.import_key(private_key)
 
-    signature = pkcs1_15.new(key). \
-        sign(sid_hash)
+    signature = pkcs1_15.new(key).sign(sid_hash)
 
     return base64.b64encode(arg).decode(), base64.b64encode(signature).decode()
