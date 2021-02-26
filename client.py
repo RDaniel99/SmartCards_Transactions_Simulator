@@ -2,12 +2,15 @@ import base64
 
 from constants import ADDRESS_CM
 from constants import ADDRESS_MC
+import pickle
 from node import Node
 from node import new_listener
 from node import new_sender
 from Crypto.Cipher import AES
 from Crypto.PublicKey import RSA
 from Crypto.Cipher import PKCS1_OAEP
+from Crypto.Signature import pkcs1_15
+from Crypto.Hash import SHA256
 import string
 import random
 from os import path
@@ -58,6 +61,7 @@ for encrypted_message in encrypted_messages:
     print(m)
     sid_and_signature.append(m)
 
+#-------------------
 digits = string.digits
 card_number = get_random_string(10)
 card_exp = get_random_string(2) + "/" + get_random_string(2)
@@ -79,8 +83,12 @@ messages["m"] = merchant_name
 print(messages)
 PI = list(messages.values())
 
+PI_bytes = pickle.dumps(PI)
+print("pi: ", pickle.loads(PI_bytes))
 
-
+signature = pkcs1_15.new(RSA.import_key(client_private_key)).sign(SHA256.new(PI_bytes))
+PM = (PI, signature)
+print("signature: ", base64.b64encode(signature).decode())
 #
 # core.add_listener(new_listener(ADDRESS_MC), ADDRESS_MC)
 # core.accept_connection(ADDRESS_MC)

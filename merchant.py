@@ -23,7 +23,7 @@ client_public_key = utils.decrypt_aes(symmetric_session_key, ciphertext, iv)
 print("-------------")
 print(client_public_key)
 
-sid, signed_hash = utils.get_signature(get_random_bytes(8), utils.load_private_keys(False))
+sid, signed_hash = utils.get_signature(get_random_bytes(8), merchant_private_key)
 
 print(sid)
 print(signed_hash)
