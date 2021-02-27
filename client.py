@@ -17,10 +17,9 @@ import numpy as np
 import json
 
 
-keys_utils.generate_keys("client")
-
 payment_gateway_public_key = keys_utils.load_public_keys("payment_gateway")
 merchant_public_key = keys_utils.load_public_keys("merchant")
+merchant_private_key = keys_utils.load_private_keys("merchant")
 
 client_public_key = keys_utils.load_public_keys("client")
 client_private_key = keys_utils.load_private_keys("client")
@@ -66,16 +65,52 @@ PI_bytes = json.dumps(PI).encode('utf-8')
 
 _, signature = crypto_utils.get_signature(PI_bytes, client_private_key)
 
+print(signature)
+print(PI)
+
 PM = (PI, signature)
 
 PI_PM = [PI_bytes, bytes(signature, encoding='utf-8')]
 
 payment_gateway_private_key = keys_utils.load_private_keys("payment_gateway")
 
+encrypted_symmetric_key, ciphertext, _, iv = crypto_utils.hybrid_encryption_individual(PI_PM[0], payment_gateway_public_key)
+
+PM_encypted = dict()
+PM_encypted["PI"] = dict()
+PM_encypted["PI"]["K"] = base64.b64encode(encrypted_symmetric_key).decode()
+PM_encypted["PI"]["M"] = base64.b64encode(ciphertext).decode()
+PM_encypted["PI"]["IV"] = base64.b64encode(iv).decode()
+
 encrypted_symmetric_key, ciphertext, _, iv = crypto_utils.hybrid_encryption_individual(PI_PM[1], payment_gateway_public_key)
 
-# TODO: de mutat in merchant
-K = crypto_utils.decrypt_rsa(payment_gateway_private_key, encrypted_symmetric_key)
-M = crypto_utils.decrypt_aes(K, ciphertext, iv)
+PM_encypted["SigC(PI)"] = dict()
+PM_encypted["SigC(PI)"]["K"] = base64.b64encode(encrypted_symmetric_key).decode()
+PM_encypted["SigC(PI)"]["M"] = base64.b64encode(ciphertext).decode()
+PM_encypted["SigC(PI)"]["IV"] = base64.b64encode(iv).decode()
+
+# print(base64.b64decode(PM_encypted["SigC(PI)"]["M"]))
+# print(ciphertext)
+
+PM_encypted_bytes = json.dumps(PM_encypted).encode('utf-8')
+
+encrypted_symmetric_key, ciphertext, _, iv = crypto_utils.hybrid_encryption_individual(PM_encypted_bytes, merchant_public_key)
+
+K = crypto_utils.decrypt_rsa(merchant_private_key, encrypted_symmetric_key)
+dict = crypto_utils.decrypt_aes(K, ciphertext, iv)
+
+M = json.loads(dict)
+
+K = crypto_utils.decrypt_rsa(payment_gateway_private_key, base64.b64decode(M["PI"]["K"]))
+M = crypto_utils.decrypt_aes(K, base64.b64decode(M["PI"]["M"]), base64.b64decode(M["PI"]["IV"]))
 
 print(M)
+M = json.loads(dict)
+
+K = crypto_utils.decrypt_rsa(payment_gateway_private_key, base64.b64decode(M["SigC(PI)"]["K"]))
+M = crypto_utils.decrypt_aes(K, base64.b64decode(M["SigC(PI)"]["M"]), base64.b64decode(M["SigC(PI)"]["IV"]))
+
+print(M)
+
+print(M)
+
