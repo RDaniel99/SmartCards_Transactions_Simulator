@@ -13,6 +13,8 @@ import string
 import utils as utils
 import crypto_utils as crypto_utils
 import keys_utils as keys_utils
+import numpy as np
+import json
 
 
 keys_utils.generate_keys("client")
@@ -59,12 +61,21 @@ for encrypted_message in encrypted_messages:
 # BEGIN
 messages = utils.generate_transaction_info(sid_and_signature, client_public_key)
 
-PI = list(messages.values())
-PI_bytes = pickle.dumps(PI)
+PI = messages
+PI_bytes = json.dumps(PI).encode('utf-8')
 
-signature = pkcs1_15.new(RSA.import_key(client_private_key)).sign(SHA256.new(PI_bytes))
+_, signature = crypto_utils.get_signature(PI_bytes, client_private_key)
+
 PM = (PI, signature)
 
-PI_PM = [PI_bytes, signature]
+PI_PM = [PI_bytes, bytes(signature, encoding='utf-8')]
 
-# encrypted_messages = utils.hybrid_encryption(PI_PM, payment_gateway_public_key)
+payment_gateway_private_key = keys_utils.load_private_keys("payment_gateway")
+
+encrypted_symmetric_key, ciphertext, _, iv = crypto_utils.hybrid_encryption_individual(PI_PM[1], payment_gateway_public_key)
+
+# TODO: de mutat in merchant
+K = crypto_utils.decrypt_rsa(payment_gateway_private_key, encrypted_symmetric_key)
+M = crypto_utils.decrypt_aes(K, ciphertext, iv)
+
+print(M)

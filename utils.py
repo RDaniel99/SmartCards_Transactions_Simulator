@@ -17,7 +17,7 @@ def generate_transaction_info(sid_and_signature, client_public_key):
     ccode = utils.get_random_string(3)
     amount = utils.get_random_string(4) + " euro"
     nc = utils.get_random_string(5)
-    merchant_name = "Moda Operandi"
+    merchant_name = "Emag"
 
     messages = dict()
     messages["card_number"] = card_number
