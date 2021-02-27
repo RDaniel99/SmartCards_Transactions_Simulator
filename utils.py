@@ -1,6 +1,7 @@
+import json
 import string
 import random
-import utils as utils
+import crypto_utils as crypto_utils
 
 
 def get_random_string(length):
@@ -10,23 +11,22 @@ def get_random_string(length):
     return result_str
 
 
-def generate_transaction_info(sid_and_signature, client_public_key):
-    digits = string.digits
-    card_number = utils.get_random_string(10)
-    card_exp = utils.get_random_string(2) + "/" + utils.get_random_string(2)
-    ccode = utils.get_random_string(3)
-    amount = utils.get_random_string(4) + " euro"
-    nc = utils.get_random_string(5)
-    merchant_name = "Emag"
+def generate_transaction_info(sid_and_signature, client_public_key, client_private_key):
+    PI = dict()
+    PI["card_number"] = get_random_string(10)
+    PI["card_exp"] = get_random_string(2) + "/" + get_random_string(2)
+    PI["ccode"] = get_random_string(3)
+    PI["sid"] = sid_and_signature[0]
+    PI["amount"] = get_random_string(4) + " euro"
+    PI["pubKC"] = client_public_key
+    PI["nc"] = get_random_string(5)
+    PI["m"] = "Emag"
 
-    messages = dict()
-    messages["card_number"] = card_number
-    messages["card_exp"] = card_exp
-    messages["ccode"] = ccode
-    messages["sid"] = sid_and_signature[0]
-    messages["amount"] = amount
-    messages["pubKC"] = client_public_key
-    messages["nc"] = nc
-    messages["m"] = merchant_name
+    PO = dict()
+    PO["orderdesc"] = get_random_string(4)
+    PO["sid"] = sid_and_signature[0]
+    PO["amount"] = PI["amount"]
+    PO["nc"] = PI["nc"]
+    PO["sigc(orderdesc, sid, amount, nc)"] = crypto_utils.get_signature(json.dumps(PO).encode('utf-8'), client_private_key)
 
-    return messages
+    return PI, PO

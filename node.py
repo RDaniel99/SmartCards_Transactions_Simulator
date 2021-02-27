@@ -37,10 +37,14 @@ class Node:
             position = self.addresses_senders.index(address)
 
             self.senders[position].close()
+            self.senders.pop(position)
+            self.addresses_senders.pop(position)
         except:
             position = self.addresses_listeners.index(address)
 
             self.listeners[position].close()
+            self.listeners.pop(position)
+            self.addresses_listeners.pop(position)
 
     def accept_connection(self, address):
         # No error handling, use the correct addresses

@@ -58,59 +58,46 @@ for encrypted_message in encrypted_messages:
 
 # STEP 3 - Send {PM, PO}PubKM
 # BEGIN
-messages = utils.generate_transaction_info(sid_and_signature, client_public_key)
 
-PI = messages
+PI, PO = utils.generate_transaction_info(sid_and_signature, client_public_key, client_private_key)
 PI_bytes = json.dumps(PI).encode('utf-8')
 
 _, signature = crypto_utils.get_signature(PI_bytes, client_private_key)
 
-print(signature)
-print(PI)
-
-PM = (PI, signature)
-
 PI_PM = [PI_bytes, bytes(signature, encoding='utf-8')]
-
-payment_gateway_private_key = keys_utils.load_private_keys("payment_gateway")
 
 encrypted_symmetric_key, ciphertext, _, iv = crypto_utils.hybrid_encryption_individual(PI_PM[0], payment_gateway_public_key)
 
-PM_encypted = dict()
-PM_encypted["PI"] = dict()
-PM_encypted["PI"]["K"] = base64.b64encode(encrypted_symmetric_key).decode()
-PM_encypted["PI"]["M"] = base64.b64encode(ciphertext).decode()
-PM_encypted["PI"]["IV"] = base64.b64encode(iv).decode()
+PM_encrypted = dict()
+PM_encrypted["PI"] = dict()
+PM_encrypted["PI"]["K"] = base64.b64encode(encrypted_symmetric_key).decode()
+PM_encrypted["PI"]["M"] = base64.b64encode(ciphertext).decode()
+PM_encrypted["PI"]["IV"] = base64.b64encode(iv).decode()
 
 encrypted_symmetric_key, ciphertext, _, iv = crypto_utils.hybrid_encryption_individual(PI_PM[1], payment_gateway_public_key)
 
-PM_encypted["SigC(PI)"] = dict()
-PM_encypted["SigC(PI)"]["K"] = base64.b64encode(encrypted_symmetric_key).decode()
-PM_encypted["SigC(PI)"]["M"] = base64.b64encode(ciphertext).decode()
-PM_encypted["SigC(PI)"]["IV"] = base64.b64encode(iv).decode()
+PM_encrypted["SigC(PI)"] = dict()
+PM_encrypted["SigC(PI)"]["K"] = base64.b64encode(encrypted_symmetric_key).decode()
+PM_encrypted["SigC(PI)"]["M"] = base64.b64encode(ciphertext).decode()
+PM_encrypted["SigC(PI)"]["IV"] = base64.b64encode(iv).decode()
 
 # print(base64.b64decode(PM_encypted["SigC(PI)"]["M"]))
 # print(ciphertext)
 
-PM_encypted_bytes = json.dumps(PM_encypted).encode('utf-8')
+PM_encrypted_bytes = json.dumps(PM_encrypted).encode('utf-8')
+PO_encrypted_bytes = json.dumps(PO).encode('utf-8')
 
-encrypted_symmetric_key, ciphertext, _, iv = crypto_utils.hybrid_encryption_individual(PM_encypted_bytes, merchant_public_key)
+encrypted_symmetric_key, ciphertext, _, iv = crypto_utils.hybrid_encryption_individual(PM_encrypted_bytes, merchant_public_key)
+encrypted_symmetric_key_2, ciphertext_2, _, iv_2 = crypto_utils.hybrid_encryption_individual(PO_encrypted_bytes, merchant_public_key)
 
-K = crypto_utils.decrypt_rsa(merchant_private_key, encrypted_symmetric_key)
-dict = crypto_utils.decrypt_aes(K, ciphertext, iv)
+core.add_sender(new_sender(ADDRESS_CM), ADDRESS_CM)
 
-M = json.loads(dict)
+core.send_message_to_address(ADDRESS_CM, encrypted_symmetric_key)
+core.send_message_to_address(ADDRESS_CM, ciphertext)
+core.send_message_to_address(ADDRESS_CM, iv)
 
-K = crypto_utils.decrypt_rsa(payment_gateway_private_key, base64.b64decode(M["PI"]["K"]))
-M = crypto_utils.decrypt_aes(K, base64.b64decode(M["PI"]["M"]), base64.b64decode(M["PI"]["IV"]))
+core.send_message_to_address(ADDRESS_CM, encrypted_symmetric_key_2)
+core.send_message_to_address(ADDRESS_CM, ciphertext_2)
+core.send_message_to_address(ADDRESS_CM, iv_2)
 
-print(M)
-M = json.loads(dict)
-
-K = crypto_utils.decrypt_rsa(payment_gateway_private_key, base64.b64decode(M["SigC(PI)"]["K"]))
-M = crypto_utils.decrypt_aes(K, base64.b64decode(M["SigC(PI)"]["M"]), base64.b64decode(M["SigC(PI)"]["IV"]))
-
-print(M)
-
-print(M)
-
+core.close_connection(ADDRESS_CM)
