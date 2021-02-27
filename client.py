@@ -101,3 +101,24 @@ core.send_message_to_address(ADDRESS_CM, ciphertext_2)
 core.send_message_to_address(ADDRESS_CM, iv_2)
 
 core.close_connection(ADDRESS_CM)
+
+# END
+
+# STEP LAST
+# BEGIN
+
+core.add_listener(new_listener(ADDRESS_MC), ADDRESS_MC)
+core.accept_connection(ADDRESS_MC)
+
+encrypted_symmetric_key = core.receive_message(ADDRESS_MC)
+ciphertext = core.receive_message(ADDRESS_MC)
+iv = core.receive_message(ADDRESS_MC)
+
+core.close_connection(ADDRESS_MC)
+
+# END
+
+K = crypto_utils.decrypt_rsa(client_private_key, encrypted_symmetric_key)
+M = crypto_utils.decrypt_aes(K, ciphertext, iv)
+
+print(M)

@@ -6,6 +6,7 @@ from node import new_listener
 from constants import ADDRESS_MC
 from constants import ADDRESS_CM
 from constants import ADDRESS_MPG
+from constants import ADDRESS_PGM
 from Crypto.Random import get_random_bytes
 import crypto_utils as crypto_utils
 import keys_utils as keys_utils
@@ -93,6 +94,39 @@ core.send_message_to_address(ADDRESS_MPG, ciphertext_2)
 core.send_message_to_address(ADDRESS_MPG, iv_2)
 
 core.close_connection(ADDRESS_MPG)
+
+# END
+
+# STEP 5 - receive ..
+# BEGIN
+
+core.add_listener(new_listener(ADDRESS_PGM), ADDRESS_PGM)
+core.accept_connection(ADDRESS_PGM)
+encrypted_symmetric_key = core.receive_message(ADDRESS_PGM)
+ciphertext = core.receive_message(ADDRESS_PGM)
+iv = core.receive_message(ADDRESS_PGM)
+core.close_connection(ADDRESS_PGM)
+# END
+
+K = crypto_utils.decrypt_rsa(merchant_private_key, encrypted_symmetric_key)
+M = crypto_utils.decrypt_aes(K, ciphertext, iv)
+
+print(M)
+
+M = json.loads(M)
+
+encrypted_symmetric_key, ciphertext, _, iv = crypto_utils.hybrid_encryption_individual(json.dumps(M).encode("utf-8"), client_public_key)
+
+# STEP LAST
+# BEGIN
+
+core.add_sender(new_sender(ADDRESS_MC), ADDRESS_MC)
+
+core.send_message_to_address(ADDRESS_MC, encrypted_symmetric_key)
+core.send_message_to_address(ADDRESS_MC, ciphertext)
+core.send_message_to_address(ADDRESS_MC, iv)
+
+core.close_connection(ADDRESS_MC)
 
 # END
 
