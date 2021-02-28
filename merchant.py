@@ -72,7 +72,6 @@ PM = json.loads(crypto_utils.decrypt_aes(K, ciphertext, iv))
 PO = json.loads(crypto_utils.decrypt_aes(K_2, ciphertext_2, iv_2))
 
 print("SigC(orderdesc, sid, amount, nc): ")
-
 crypto_utils.verify_signature(client_public_key, base64.b64decode(PO["sigc(orderdesc, sid, amount, nc)"][1]),
                               base64.b64decode(PO["sigc(orderdesc, sid, amount, nc)"][0]))
 
@@ -83,6 +82,8 @@ sig_dict_for_step_4["pubKC"] = client_public_key.decode('utf-8')
 
 signature_for_step_4 = crypto_utils.get_signature(json.dumps(sig_dict_for_step_4).encode('utf-8'),
                                                   merchant_private_key)
+
+merchant_public_key = keys_utils.load_public_keys("merchant")
 
 print("data: ", json.dumps(sig_dict_for_step_4).encode('utf-8'))
 print("sign: ", signature_for_step_4[1])

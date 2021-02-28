@@ -57,8 +57,6 @@ amount = PI["amount"]
 nc = PI["nc"]
 
 print("SigC(PI): ")
-
-print("PI: ", PI)
 crypto_utils.verify_signature(client_public_key, M_sig, json.dumps(PI).encode('utf-8'))
 
 resp = "404 Pg not found"
@@ -82,15 +80,8 @@ sig_dict_for_step_4["amount"] = amount
 sig_dict_for_step_4["sid"] = sid
 sig_dict_for_step_4["pubKC"] = client_public_key
 
-#h = base64.b64encode(json.dumps(sig_dict_for_step_4).encode('utf-8')).decode()
-
-#print(h)
-
-
-print("SIG DIC: ", json.dumps(sig_dict_for_step_4).encode('utf-8'))
-crypto_utils.verify_signature(merchant_public_key, sigM, json.dumps(sig_dict_for_step_4).encode('utf-8'))
-
-print(sigM)
+print("SigM(Sid, PubKC, Amount):")
+crypto_utils.verify_signature(merchant_public_key, base64.b64decode(sigM), base64.b64decode(base64.b64encode(json.dumps(sig_dict_for_step_4).encode('utf-8')).decode()))
 
 core.add_sender(new_sender(ADDRESS_PGM), ADDRESS_PGM)
 core.send_message_to_address(ADDRESS_PGM, encrypted_symmetric_key)
