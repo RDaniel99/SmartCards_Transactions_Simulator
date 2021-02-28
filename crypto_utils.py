@@ -11,7 +11,7 @@ def decrypt_aes(key, msg, iv):
     """Method to decrypt using AES (same IV as encryption)"""
     cipher = AES.new(key, AES.MODE_CFB, iv)
     plaintext = cipher.decrypt(msg)
-    return plaintext.decode('utf-8')
+    return base64.b64decode(base64.b64encode(plaintext).decode())
 
 
 def decrypt_rsa(key, ciphertext):
@@ -47,9 +47,20 @@ def hybrid_encryption_individual(message, digital_envelope):
 
 
 def get_signature(arg, private_key):
-    sid_hash = SHA256.new(arg)
-    key = RSA.import_key(private_key)
 
-    signature = pkcs1_15.new(key).sign(sid_hash)
+    key = RSA.import_key(private_key)
+    h = SHA256.new(arg)
+
+    signature = pkcs1_15.new(key).sign(h)
 
     return base64.b64encode(arg).decode(), base64.b64encode(signature).decode()
+
+
+def verify_signature(key, signature, message):
+    h = SHA256.new(base64.b64decode(base64.b64encode(message).decode()))
+    key = RSA.import_key(key)
+    try:
+        pkcs1_15.new(key).verify(h, signature)
+        print("The signature is valid.")
+    except (ValueError, TypeError):
+        print("The signature is not valid.")

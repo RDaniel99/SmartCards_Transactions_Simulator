@@ -4,7 +4,10 @@
     <list default="true" id="9c9d4cf3-520d-4138-845d-fbff858888b9" name="Default Changelist" comment="New">
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/client.py" beforeDir="false" afterPath="$PROJECT_DIR$/client.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/crypto_utils.py" beforeDir="false" afterPath="$PROJECT_DIR$/crypto_utils.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/merchant.py" beforeDir="false" afterPath="$PROJECT_DIR$/merchant.py" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/payment_gateway.py" beforeDir="false" afterPath="$PROJECT_DIR$/payment_gateway.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/utils.py" beforeDir="false" afterPath="$PROJECT_DIR$/utils.py" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -84,7 +87,7 @@
       <option name="INPUT_FILE" value="" />
       <method v="2" />
     </configuration>
-    <configuration name="payment_gateway" type="PythonConfigurationType" factoryName="Python" temporary="true" nameIsGenerated="true">
+    <configuration name="payment_gateway" type="PythonConfigurationType" factoryName="Python" nameIsGenerated="true">
       <module name="SmartCards_Transactions_Simulator" />
       <option name="INTERPRETER_OPTIONS" value="" />
       <option name="PARENT_ENVS" value="true" />
@@ -110,11 +113,6 @@
       <item itemvalue="Python.m" />
       <item itemvalue="Python.payment_gateway" />
     </list>
-    <recent_temporary>
-      <list>
-        <item itemvalue="Python.payment_gateway" />
-      </list>
-    </recent_temporary>
   </component>
   <component name="SpellCheckerSettings" RuntimeDictionaries="0" Folders="0" CustomDictionaries="0" DefaultDictionary="application-level" UseSingleDictionary="true" transferred="true" />
   <component name="TaskManager">

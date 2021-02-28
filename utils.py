@@ -27,6 +27,8 @@ def generate_transaction_info(sid_and_signature, client_public_key, client_priva
     PO["sid"] = sid_and_signature[0]
     PO["amount"] = PI["amount"]
     PO["nc"] = PI["nc"]
-    PO["sigc(orderdesc, sid, amount, nc)"] = crypto_utils.get_signature(json.dumps(PO).encode('utf-8'), client_private_key)
+    PO_signature_args = json.dumps(PO).encode('utf-8')
 
-    return PI, PO
+    PO["sigc(orderdesc, sid, amount, nc)"] = crypto_utils.get_signature(PO_signature_args, client_private_key)
+
+    return PI, PO, PO_signature_args

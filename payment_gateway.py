@@ -12,6 +12,8 @@ import crypto_utils as crypto_utils
 from os import path
 
 payment_gateway_private_key = keys_utils.load_private_keys("payment_gateway")
+client_public_key = keys_utils.load_public_keys("client")
+merchant_private_key = keys_utils.load_private_keys("merchant")
 
 core = Node()
 
@@ -43,11 +45,18 @@ sigM = json.loads(crypto_utils.decrypt_aes(K_2, ciphertext_2, iv_2))
 K_3 = crypto_utils.decrypt_rsa(payment_gateway_private_key, base64.b64decode(PM["PI"]["K"]))
 M_3 = crypto_utils.decrypt_aes(K_3, base64.b64decode(PM["PI"]["M"]), base64.b64decode(PM["PI"]["IV"]))
 
+K_sign = crypto_utils.decrypt_rsa(payment_gateway_private_key, base64.b64decode(PM["SigC(PI)"]["K"]))
+M_sig = crypto_utils.decrypt_aes(K_sign, base64.b64decode(PM["SigC(PI)"]["M"]), base64.b64decode(PM["SigC(PI)"]["IV"]))
+
 PI = json.loads(M_3)
 
 sid = PI["sid"]
 amount = PI["amount"]
 nc = PI["nc"]
+
+print("SigC(PI): ")
+
+crypto_utils.verify_signature(client_public_key, M_sig, json.dumps(PI).encode('utf-8'))
 
 resp = "404 Pg not found"
 
@@ -64,6 +73,7 @@ json_step_5["sigPG"] = crypto_utils.get_signature(json.dumps(mini_json).encode("
 
 merchant_public_key = keys_utils.load_public_keys("merchant")
 encrypted_symmetric_key, ciphertext, _, iv = crypto_utils.hybrid_encryption_individual(json.dumps(json_step_5).encode("utf-8"), merchant_public_key)
+
 
 core.add_sender(new_sender(ADDRESS_PGM), ADDRESS_PGM)
 core.send_message_to_address(ADDRESS_PGM, encrypted_symmetric_key)

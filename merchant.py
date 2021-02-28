@@ -1,3 +1,4 @@
+import base64
 import json
 
 from node import Node
@@ -32,7 +33,7 @@ client_public_key = crypto_utils.decrypt_aes(symmetric_session_key, ciphertext, 
 # BEGIN
 sid, signed_hash = crypto_utils.get_signature(get_random_bytes(8), merchant_private_key)
 
-messages = [bytes(sid, encoding='utf-8'), bytes(signed_hash, encoding='utf-8')]
+messages = [base64.b64decode(sid), base64.b64decode(signed_hash)]
 
 encrypted_messages = crypto_utils.hybrid_encryption(messages, client_public_key)
 
@@ -58,7 +59,6 @@ iv = core.receive_message(ADDRESS_CM)
 encrypted_symmetric_key_2 = core.receive_message(ADDRESS_CM)
 ciphertext_2 = core.receive_message(ADDRESS_CM)
 iv_2 = core.receive_message(ADDRESS_CM)
-
 core.close_connection(ADDRESS_CM)
 
 # END
@@ -71,17 +71,24 @@ K_2 = crypto_utils.decrypt_rsa(merchant_private_key, encrypted_symmetric_key_2)
 PM = json.loads(crypto_utils.decrypt_aes(K, ciphertext, iv))
 PO = json.loads(crypto_utils.decrypt_aes(K_2, ciphertext_2, iv_2))
 
+print("SigC(orderdesc, sid, amount, nc): ")
+
+crypto_utils.verify_signature(client_public_key, base64.b64decode(PO["sigc(orderdesc, sid, amount, nc)"][1]),
+                              base64.b64decode(PO["sigc(orderdesc, sid, amount, nc)"][0]))
+
 sig_dict_for_step_4 = dict()
 sig_dict_for_step_4["amount"] = PO["amount"]
 sig_dict_for_step_4["sid"] = sid
-sig_dict_for_step_4["pubKC"] = client_public_key
+sig_dict_for_step_4["pubKC"] = client_public_key.decode('utf-8')
 
-signature_for_step_4 = crypto_utils.get_signature(json.dumps(sig_dict_for_step_4).encode('utf-8'), merchant_private_key)
+signature_for_step_4 = crypto_utils.get_signature(json.dumps(sig_dict_for_step_4).encode('utf-8'),
+                                                  merchant_private_key)
 
 payment_gateway_public_key = keys_utils.load_public_keys("payment_gateway")
 
 encrypted_symmetric_key, ciphertext, _, iv = crypto_utils.hybrid_encryption_individual(json.dumps(PM).encode('utf-8'), payment_gateway_public_key)
-encrypted_symmetric_key_2, ciphertext_2, _, iv_2 = crypto_utils.hybrid_encryption_individual(json.dumps(sig_dict_for_step_4).encode('utf-8'), payment_gateway_public_key)
+encrypted_symmetric_key_2, ciphertext_2, _, iv_2 = crypto_utils.hybrid_encryption_individual(json.dumps(signature_for_step_4[1]).encode('utf-8'), payment_gateway_public_key)
+
 
 core.add_sender(new_sender(ADDRESS_MPG), ADDRESS_MPG)
 
@@ -109,9 +116,7 @@ core.close_connection(ADDRESS_PGM)
 # END
 
 K = crypto_utils.decrypt_rsa(merchant_private_key, encrypted_symmetric_key)
-M = crypto_utils.decrypt_aes(K, ciphertext, iv)
-
-print(M)
+M = crypto_utils.decrypt_aes(K, ciphertext, iv).decode('utf-8')
 
 M = json.loads(M)
 
