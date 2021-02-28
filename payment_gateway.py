@@ -1,6 +1,8 @@
 import base64
 import json
 
+from Cryptodome.Hash import SHA256
+
 from node import Node
 from node import new_sender
 from node import new_listener
@@ -56,6 +58,7 @@ nc = PI["nc"]
 
 print("SigC(PI): ")
 
+print("PI: ", PI)
 crypto_utils.verify_signature(client_public_key, M_sig, json.dumps(PI).encode('utf-8'))
 
 resp = "404 Pg not found"
@@ -74,6 +77,20 @@ json_step_5["sigPG"] = crypto_utils.get_signature(json.dumps(mini_json).encode("
 merchant_public_key = keys_utils.load_public_keys("merchant")
 encrypted_symmetric_key, ciphertext, _, iv = crypto_utils.hybrid_encryption_individual(json.dumps(json_step_5).encode("utf-8"), merchant_public_key)
 
+sig_dict_for_step_4 = dict()
+sig_dict_for_step_4["amount"] = amount
+sig_dict_for_step_4["sid"] = sid
+sig_dict_for_step_4["pubKC"] = client_public_key
+
+#h = base64.b64encode(json.dumps(sig_dict_for_step_4).encode('utf-8')).decode()
+
+#print(h)
+
+
+print("SIG DIC: ", json.dumps(sig_dict_for_step_4).encode('utf-8'))
+crypto_utils.verify_signature(merchant_public_key, sigM, json.dumps(sig_dict_for_step_4).encode('utf-8'))
+
+print(sigM)
 
 core.add_sender(new_sender(ADDRESS_PGM), ADDRESS_PGM)
 core.send_message_to_address(ADDRESS_PGM, encrypted_symmetric_key)

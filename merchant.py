@@ -84,6 +84,10 @@ sig_dict_for_step_4["pubKC"] = client_public_key.decode('utf-8')
 signature_for_step_4 = crypto_utils.get_signature(json.dumps(sig_dict_for_step_4).encode('utf-8'),
                                                   merchant_private_key)
 
+print("data: ", json.dumps(sig_dict_for_step_4).encode('utf-8'))
+print("sign: ", signature_for_step_4[1])
+
+
 payment_gateway_public_key = keys_utils.load_public_keys("payment_gateway")
 
 encrypted_symmetric_key, ciphertext, _, iv = crypto_utils.hybrid_encryption_individual(json.dumps(PM).encode('utf-8'), payment_gateway_public_key)
