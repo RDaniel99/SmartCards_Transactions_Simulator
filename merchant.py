@@ -85,10 +85,6 @@ signature_for_step_4 = crypto_utils.get_signature(json.dumps(sig_dict_for_step_4
 
 merchant_public_key = keys_utils.load_public_keys("merchant")
 
-print("data: ", json.dumps(sig_dict_for_step_4).encode('utf-8'))
-print("sign: ", signature_for_step_4[1])
-
-
 payment_gateway_public_key = keys_utils.load_public_keys("payment_gateway")
 
 encrypted_symmetric_key, ciphertext, _, iv = crypto_utils.hybrid_encryption_individual(json.dumps(PM).encode('utf-8'), payment_gateway_public_key)
@@ -124,6 +120,17 @@ K = crypto_utils.decrypt_rsa(merchant_private_key, encrypted_symmetric_key)
 M = crypto_utils.decrypt_aes(K, ciphertext, iv).decode('utf-8')
 
 M = json.loads(M)
+
+sigPG = M["sigPG"]
+
+dict_step_5 = dict()
+dict_step_5["resp"] = M["resp"]
+dict_step_5["sid"] = PO["sid"]
+dict_step_5["amount"] = PO["amount"]
+dict_step_5["nc"] = PO["nc"]
+
+print("SigPG(Resp, Sid, Amount, NC):")
+crypto_utils.verify_signature(payment_gateway_public_key, base64.b64decode(sigPG), json.dumps(dict_step_5).encode('utf-8'))
 
 encrypted_symmetric_key, ciphertext, _, iv = crypto_utils.hybrid_encryption_individual(json.dumps(M).encode("utf-8"), client_public_key)
 

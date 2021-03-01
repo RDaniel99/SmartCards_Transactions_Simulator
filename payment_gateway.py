@@ -13,6 +13,7 @@ import crypto_utils as crypto_utils
 
 from os import path
 
+payment_gateway_public_key = keys_utils.load_public_keys("payment_gateway")
 payment_gateway_private_key = keys_utils.load_private_keys("payment_gateway")
 client_public_key = keys_utils.load_public_keys("client")
 merchant_private_key = keys_utils.load_private_keys("merchant")
@@ -70,7 +71,7 @@ mini_json["nc"] = nc
 json_step_5 = dict()
 json_step_5["resp"] = resp
 json_step_5["sid"] = sid
-json_step_5["sigPG"] = crypto_utils.get_signature(json.dumps(mini_json).encode("utf-8"), payment_gateway_private_key)
+json_step_5["sigPG"] = crypto_utils.get_signature(json.dumps(mini_json).encode("utf-8"), payment_gateway_private_key)[1]
 
 merchant_public_key = keys_utils.load_public_keys("merchant")
 encrypted_symmetric_key, ciphertext, _, iv = crypto_utils.hybrid_encryption_individual(json.dumps(json_step_5).encode("utf-8"), merchant_public_key)
@@ -81,7 +82,7 @@ sig_dict_for_step_4["sid"] = sid
 sig_dict_for_step_4["pubKC"] = client_public_key
 
 print("SigM(Sid, PubKC, Amount):")
-crypto_utils.verify_signature(merchant_public_key, base64.b64decode(sigM), base64.b64decode(base64.b64encode(json.dumps(sig_dict_for_step_4).encode('utf-8')).decode()))
+crypto_utils.verify_signature(merchant_public_key, base64.b64decode(sigM), json.dumps(sig_dict_for_step_4).encode('utf-8'))
 
 core.add_sender(new_sender(ADDRESS_PGM), ADDRESS_PGM)
 core.send_message_to_address(ADDRESS_PGM, encrypted_symmetric_key)

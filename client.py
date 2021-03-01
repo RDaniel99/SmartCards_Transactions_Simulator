@@ -3,6 +3,7 @@ import base64
 from constants import ADDRESS_CM
 from constants import ADDRESS_MC
 import pickle
+import time
 from node import Node
 from node import new_listener
 from node import new_sender
@@ -114,6 +115,8 @@ core.send_message_to_address(ADDRESS_CM, iv_2)
 
 core.close_connection(ADDRESS_CM)
 
+start_time = time.time()
+
 # END
 
 # STEP LAST
@@ -128,9 +131,26 @@ iv = core.receive_message(ADDRESS_MC)
 
 core.close_connection(ADDRESS_MC)
 
+if 5 < (time.time() - start_time):
+    print("Time out...")
+    exit(0)
+
 # END
 
 K = crypto_utils.decrypt_rsa(client_private_key, encrypted_symmetric_key)
 M = crypto_utils.decrypt_aes(K, ciphertext, iv).decode('utf-8')
+
+M = json.loads(M)
+
+sigPG = M["sigPG"]
+
+dict_step_5 = dict()
+dict_step_5["resp"] = M["resp"]
+dict_step_5["sid"] = PO["sid"]
+dict_step_5["amount"] = PO["amount"]
+dict_step_5["nc"] = PO["nc"]
+
+print("SigPG(Resp, Sid, Amount, NC):")
+crypto_utils.verify_signature(payment_gateway_public_key, base64.b64decode(sigPG), json.dumps(dict_step_5).encode('utf-8'))
 
 print(M)
