@@ -62,5 +62,7 @@ def verify_signature(key, signature, message):
     try:
         pkcs1_15.new(key).verify(h, signature)
         print("The signature is valid.")
+        return True
     except (ValueError, TypeError):
         print("The signature is not valid.")
+        return False

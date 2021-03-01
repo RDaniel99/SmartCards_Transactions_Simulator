@@ -16,6 +16,7 @@ import crypto_utils as crypto_utils
 import keys_utils as keys_utils
 import numpy as np
 import json
+import bank_deposit
 
 payment_gateway_public_key = keys_utils.load_public_keys("payment_gateway")
 merchant_public_key = keys_utils.load_public_keys("merchant")
@@ -152,5 +153,7 @@ dict_step_5["nc"] = PO["nc"]
 
 print("SigPG(Resp, Sid, Amount, NC):")
 crypto_utils.verify_signature(payment_gateway_public_key, base64.b64decode(sigPG), json.dumps(dict_step_5).encode('utf-8'))
+
+
 
 print(M)

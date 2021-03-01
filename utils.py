@@ -13,11 +13,11 @@ def get_random_string(length):
 
 def generate_transaction_info(sid_and_signature, client_public_key, client_private_key):
     PI = dict()
-    PI["card_number"] = get_random_string(10)
-    PI["card_exp"] = get_random_string(2) + "/" + get_random_string(2)
-    PI["ccode"] = get_random_string(3)
+    PI["card_number"] = '123456789'
+    PI["card_exp"] = '03/02'
+    PI["ccode"] = '456'
     PI["sid"] = sid_and_signature[0]
-    PI["amount"] = get_random_string(4) + " euro"
+    PI["amount"] = '1000'
     PI["pubKC"] = client_public_key
     PI["nc"] = get_random_string(5)
     PI["m"] = "Emag"
