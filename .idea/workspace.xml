@@ -2,11 +2,9 @@
 <project version="4">
   <component name="ChangeListManager">
     <list default="true" id="9c9d4cf3-520d-4138-845d-fbff858888b9" name="Default Changelist" comment="New">
-      <change afterPath="$PROJECT_DIR$/back_deposit.json" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/bank_deposit.py" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/client.py" beforeDir="false" afterPath="$PROJECT_DIR$/client.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/crypto_utils.py" beforeDir="false" afterPath="$PROJECT_DIR$/crypto_utils.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/back_deposit.json" beforeDir="false" afterPath="$PROJECT_DIR$/back_deposit.json" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/bank_deposit.py" beforeDir="false" afterPath="$PROJECT_DIR$/bank_deposit.py" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/payment_gateway.py" beforeDir="false" afterPath="$PROJECT_DIR$/payment_gateway.py" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/utils.py" beforeDir="false" afterPath="$PROJECT_DIR$/utils.py" afterDir="false" />
     </list>

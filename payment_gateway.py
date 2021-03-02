@@ -58,11 +58,24 @@ sid = PI["sid"]
 amount = PI["amount"]
 nc = PI["nc"]
 card_number = PI['card_number']
+card_exp = PI['card_exp']
+ccode = PI['ccode']
 
 print("SigC(PI): ")
 crypto_utils.verify_signature(client_public_key, M_sig, json.dumps(PI).encode('utf-8'))
 
 resp = "404 Pg not found"
+
+credit_card = bank_deposit.search(card_number, card_exp, ccode)
+amount_available = 0
+for r in credit_card:
+    amount_available = r['amount']
+
+if int(amount_available) - int(amount) < 0:
+    resp = "The client does not have enough money to finish the tranzaction"
+else:
+    resp = "The transaction was successfully accomplished"
+client_remaining_amount = int(amount_available) - int(amount)
 
 mini_json = dict()
 mini_json["resp"] = resp
@@ -84,26 +97,20 @@ sig_dict_for_step_4["amount"] = amount
 sig_dict_for_step_4["sid"] = sid
 sig_dict_for_step_4["pubKC"] = client_public_key
 
-bank_deposit.insert()
+# bank_deposit.insert()
 print("SigM(Sid, PubKC, Amount):")
 if (crypto_utils.verify_signature(merchant_public_key, base64.b64decode(sigM),
                                   json.dumps(sig_dict_for_step_4).encode('utf-8')) == True):
 
-    credit_card = bank_deposit.search(card_number)
-    amount_available = 0
-    for r in credit_card:
-        amount_available = r['amount']
+    if client_remaining_amount > 0:
+        bank_deposit.update(str(client_remaining_amount), card_number)
 
-    amount_remaining = int(amount_available) - int(amount)
+        credit_card = bank_deposit.search('270119999', "04/02", "496")
+        for r in credit_card:
+            amount_available_merchant = r['amount']
 
-    bank_deposit.update(str(amount_remaining), card_number)
-
-    credit_card = bank_deposit.search('270119999')
-    for r in credit_card:
-        amount_available_merchant = r['amount']
-
-    amount_remaining = int(amount_available) + int(amount)
-    bank_deposit.update(str(amount_remaining), '270119999')
+        amount_remaining = int(amount_available_merchant) + int(amount)
+        bank_deposit.update(str(amount_remaining), '270119999')
 
 
 core.add_sender(new_sender(ADDRESS_PGM), ADDRESS_PGM)

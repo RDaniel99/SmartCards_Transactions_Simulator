@@ -23,7 +23,7 @@ def generate_transaction_info(sid_and_signature, client_public_key, client_priva
     PI["m"] = "Emag"
 
     PO = dict()
-    PO["orderdesc"] = get_random_string(4)
+    PO["orderdesc"] = "Pay the electricity bill"
     PO["sid"] = sid_and_signature[0]
     PO["amount"] = PI["amount"]
     PO["nc"] = PI["nc"]

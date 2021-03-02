@@ -21,8 +21,8 @@ def insert():
                          'amount': '100'})
 
 
-def search(card_number):
-    results = bank_deposit.search(User.card_number == card_number)
+def search(card_number, card_exp, ccode):
+    results = bank_deposit.search(User.card_number == card_number and User.card_exp == card_exp and User.ccode == ccode)
     return results
 
 
