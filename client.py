@@ -58,7 +58,8 @@ for encrypted_message in encrypted_messages:
 
 print("SigM(Sid): ")
 
-crypto_utils.verify_signature(merchant_public_key, sid_and_signature[1], sid_and_signature[0])
+if (crypto_utils.verify_signature(merchant_public_key, sid_and_signature[1], sid_and_signature[0]) == False):
+    exit(0)
 
 # END
 
@@ -152,7 +153,8 @@ dict_step_5["amount"] = PO["amount"]
 dict_step_5["nc"] = PO["nc"]
 
 print("SigPG(Resp, Sid, Amount, NC):")
-crypto_utils.verify_signature(payment_gateway_public_key, base64.b64decode(sigPG), json.dumps(dict_step_5).encode('utf-8'))
+if crypto_utils.verify_signature(payment_gateway_public_key, base64.b64decode(sigPG), json.dumps(dict_step_5).encode('utf-8')) == False:
+    exit(0)
 
 
 

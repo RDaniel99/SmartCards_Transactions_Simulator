@@ -62,7 +62,8 @@ card_exp = PI['card_exp']
 ccode = PI['ccode']
 
 print("SigC(PI): ")
-crypto_utils.verify_signature(client_public_key, M_sig, json.dumps(PI).encode('utf-8'))
+if (crypto_utils.verify_signature(client_public_key, M_sig, json.dumps(PI).encode('utf-8')) == False):
+    exit(0)
 
 resp = "404 Pg not found"
 
@@ -111,7 +112,6 @@ if (crypto_utils.verify_signature(merchant_public_key, base64.b64decode(sigM),
 
         amount_remaining = int(amount_available_merchant) + int(amount)
         bank_deposit.update(str(amount_remaining), '270119999')
-
 
 core.add_sender(new_sender(ADDRESS_PGM), ADDRESS_PGM)
 core.send_message_to_address(ADDRESS_PGM, encrypted_symmetric_key)

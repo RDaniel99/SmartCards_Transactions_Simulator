@@ -72,8 +72,9 @@ PM = json.loads(crypto_utils.decrypt_aes(K, ciphertext, iv))
 PO = json.loads(crypto_utils.decrypt_aes(K_2, ciphertext_2, iv_2))
 
 print("SigC(orderdesc, sid, amount, nc): ")
-crypto_utils.verify_signature(client_public_key, base64.b64decode(PO["sigc(orderdesc, sid, amount, nc)"][1]),
-                              base64.b64decode(PO["sigc(orderdesc, sid, amount, nc)"][0]))
+if(crypto_utils.verify_signature(client_public_key, base64.b64decode(PO["sigc(orderdesc, sid, amount, nc)"][1]),
+                              base64.b64decode(PO["sigc(orderdesc, sid, amount, nc)"][0])) == False):
+    exit(0)
 
 sig_dict_for_step_4 = dict()
 sig_dict_for_step_4["amount"] = PO["amount"]
@@ -130,7 +131,8 @@ dict_step_5["amount"] = PO["amount"]
 dict_step_5["nc"] = PO["nc"]
 
 print("SigPG(Resp, Sid, Amount, NC):")
-crypto_utils.verify_signature(payment_gateway_public_key, base64.b64decode(sigPG), json.dumps(dict_step_5).encode('utf-8'))
+if(crypto_utils.verify_signature(payment_gateway_public_key, base64.b64decode(sigPG), json.dumps(dict_step_5).encode('utf-8')) == False):
+    exit(0)
 
 encrypted_symmetric_key, ciphertext, _, iv = crypto_utils.hybrid_encryption_individual(json.dumps(M).encode("utf-8"), client_public_key)
 
